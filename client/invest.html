@@ -830,6 +830,180 @@
       btnConfirmInvest.disabled = false;
     });
 
+    // ==========================================
+    // Full Withdrawal Modal Logic
+    // ==========================================
+    const withdrawModalHTML = `
+      <div class="deposit-overlay" id="withdraw-overlay">
+        <div class="deposit-modal" id="withdraw-modal">
+          <div class="modal-header">
+            <h4 class="modal-title">Withdraw</h4>
+            <button class="btn-close-modal" id="btn-close-withdraw">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="deposit-network-select" style="margin-bottom: 24px;">
+            <span class="address-label">Withdraw Method</span>
+            <div class="network-tabs" id="withdraw-method-tabs">
+              <div class="network-tab active" data-method="crypto">Crypto Wallet</div>
+              <div class="network-tab" data-method="bank">Bank Transfer</div>
+            </div>
+          </div>
+
+          <!-- Crypto Form -->
+          <form class="withdraw-form" id="form-full-withdraw-crypto">
+            <div class="form-group" style="margin-bottom: 14px;">
+              <label class="form-lbl">Asset</label>
+              <div class="dropdown-container">
+                <select id="full-withdraw-coin" class="dropdown-select" style="padding-left: 12px;">
+                  <option value="BTC">Bitcoin (BTC)</option>
+                  <option value="ETH">Ethereum (ETH)</option>
+                  <option value="USDT">Tether (USDT)</option>
+                </select>
+                <svg class="dropdown-arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 14px;">
+              <label class="form-lbl">Destination Address</label>
+              <input type="text" id="full-withdraw-address" class="form-input" placeholder="e.g. 1A1zP1e..." style="padding-left: 12px;">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 20px;">
+              <label class="form-lbl">Amount</label>
+              <div class="input-container">
+                <input type="number" id="full-withdraw-amount" placeholder="0.00" class="form-input" step="0.000001" min="0.000001">
+              </div>
+            </div>
+            
+            <button type="submit" id="btn-submit-full-crypto" class="btn-review-withdraw" style="width: 100%;">Review Crypto Withdrawal</button>
+          </form>
+
+          <!-- Bank Form -->
+          <form class="withdraw-form" id="form-full-withdraw-bank" style="display: none;">
+            <div class="form-group" style="margin-bottom: 14px;">
+              <label class="form-lbl">Select Bank</label>
+              <div class="dropdown-container">
+                <select id="full-withdraw-bank-account" class="dropdown-select" style="padding-left: 12px;">
+                  <option value="Chase Bank - **4512">Chase Bank - **4512</option>
+                  <option value="Bank of America - **7890">Bank of America - **7890</option>
+                  <option value="Wells Fargo - **1234">Wells Fargo - **1234</option>
+                </select>
+                <svg class="dropdown-arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </div>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 20px;">
+              <label class="form-lbl">Amount (USD)</label>
+              <div class="input-container">
+                <input type="number" id="full-withdraw-bank-amount" placeholder="0.00" class="form-input" step="1" min="1">
+              </div>
+            </div>
+            
+            <button type="submit" id="btn-submit-full-bank" class="btn-review-withdraw" style="width: 100%;">Review Bank Withdrawal</button>
+          </form>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', withdrawModalHTML);
+
+    const menuWithdraw = document.getElementById('menu-withdraw');
+    const withdrawOverlay = document.getElementById('withdraw-overlay');
+    const btnCloseWithdraw = document.getElementById('btn-close-withdraw');
+    const withdrawMethodTabs = document.querySelectorAll('#withdraw-method-tabs .network-tab');
+    const formFullCrypto = document.getElementById('form-full-withdraw-crypto');
+    const formFullBank = document.getElementById('form-full-withdraw-bank');
+
+    menuWithdraw.addEventListener('click', (e) => {
+      e.preventDefault();
+      withdrawOverlay.classList.add('open');
+    });
+
+    btnCloseWithdraw.addEventListener('click', () => {
+      withdrawOverlay.classList.remove('open');
+    });
+
+    withdrawOverlay.addEventListener('click', (e) => {
+      if (e.target === withdrawOverlay) {
+        withdrawOverlay.classList.remove('open');
+      }
+    });
+
+    withdrawMethodTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        withdrawMethodTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        if (tab.dataset.method === 'crypto') {
+          formFullCrypto.style.display = 'block';
+          formFullBank.style.display = 'none';
+        } else {
+          formFullCrypto.style.display = 'none';
+          formFullBank.style.display = 'block';
+        }
+      });
+    });
+
+    async function processFullWithdrawal(coin, address, amount, btnElement, formElement, btnText) {
+      if (!address || address.length < 10) {
+        alert("Please select a valid destination or bank.");
+        return;
+      }
+      if (isNaN(amount) || amount <= 0) {
+        alert("Please enter a valid amount.");
+        return;
+      }
+      
+      btnElement.textContent = 'Processing...';
+      btnElement.disabled = true;
+
+      try {
+        const res = await fetch('../server/withdraw.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ coin, amount, address })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          alert(data.message);
+          formElement.reset();
+          withdrawOverlay.classList.remove('open');
+          fetchPrices(); // Refresh dashboard balances!
+        } else {
+          alert("Withdrawal failed: " + data.message);
+        }
+      } catch (err) {
+        alert("Network error processing withdrawal.");
+      }
+      
+      btnElement.textContent = btnText;
+      btnElement.disabled = false;
+    }
+
+    formFullCrypto.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const coin = document.getElementById('full-withdraw-coin').value;
+      const address = document.getElementById('full-withdraw-address').value;
+      const amount = parseFloat(document.getElementById('full-withdraw-amount').value);
+      processFullWithdrawal(coin, address, amount, document.getElementById('btn-submit-full-crypto'), formFullCrypto, 'Review Crypto Withdrawal');
+    });
+
+    formFullBank.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const coin = 'USDT';
+      const address = document.getElementById('full-withdraw-bank-account').value;
+      const amount = parseFloat(document.getElementById('full-withdraw-bank-amount').value);
+      processFullWithdrawal(coin, address, amount, document.getElementById('btn-submit-full-bank'), formFullBank, 'Review Bank Withdrawal');
+    });
   </script>
 </body>
 </html>
