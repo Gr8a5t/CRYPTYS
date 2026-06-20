@@ -375,6 +375,12 @@
             userBalances.usd = userData.data.balance_usd || 0;
             userBalances.total_invested = userData.data.total_invested || 0;
             userBalances.active_plans = userData.data.active_plans || 0;
+            
+            // Dynamically update profile name (First name only)
+            const profileName = document.querySelector('.profile-name');
+            if (profileName && userData.data.full_name) {
+              profileName.textContent = userData.data.full_name.split(' ')[0];
+            }
           }
         }
       } catch (e) {

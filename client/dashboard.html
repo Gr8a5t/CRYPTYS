@@ -647,6 +647,12 @@
             userBalances.btc = userData.data.balance_btc || 0;
             userBalances.eth = userData.data.balance_eth || 0;
             userBalances.usd = userData.data.balance_usd || 0;
+            
+            // Dynamically update profile name (First name only)
+            const profileName = document.querySelector('.profile-name');
+            if (profileName && userData.data.full_name) {
+              profileName.textContent = userData.data.full_name.split(' ')[0];
+            }
           }
         }
       } catch (e) {

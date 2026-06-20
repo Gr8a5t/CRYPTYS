@@ -22,7 +22,7 @@ if (!isset($_SESSION['user_id'])) {
 $userId = $_SESSION['user_id'];
 
 // Fetch user data
-$stmt = $pdo->prepare("SELECT balance_usd, balance_btc, balance_eth FROM users WHERE id = ?");
+$stmt = $pdo->prepare("SELECT full_name, email, balance_usd, balance_btc, balance_eth FROM users WHERE id = ?");
 $stmt->execute([$userId]);
 $user = $stmt->fetch();
 
@@ -35,6 +35,8 @@ if ($user) {
     echo json_encode([
         "success" => true,
         "data" => [
+            "full_name" => $user['full_name'],
+            "email" => $user['email'],
             "balance_usd" => (float)$user['balance_usd'],
             "balance_btc" => (float)$user['balance_btc'],
             "balance_eth" => (float)$user['balance_eth'],
