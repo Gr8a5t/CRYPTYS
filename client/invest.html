@@ -279,11 +279,11 @@
 
   <script>
     async function fetchPrices() {
-      function updateUI(data) {
+      function updateUI(data, balances) {
         try {
-          // Holdings
-          const btcQty = 0.124;
-          const ethQty = 1.21;
+          // Holdings from Database
+          const btcQty = balances.btc;
+          const ethQty = balances.eth;
           
           const btcPrice = data.bitcoin.usd;
           const ethPrice = data.ethereum.usd;
@@ -357,6 +357,21 @@
         }
       }
 
+      let userBalances = { btc: 0, eth: 0, usd: 0 };
+      try {
+        const userRes = await fetch('../server/api.php');
+        if (userRes.ok) {
+          const userData = await userRes.json();
+          if (userData.success && userData.data) {
+            userBalances.btc = userData.data.balance_btc || 0;
+            userBalances.eth = userData.data.balance_eth || 0;
+            userBalances.usd = userData.data.balance_usd || 0;
+          }
+        }
+      } catch (e) {
+        console.warn("Could not fetch user balances", e);
+      }
+
       const data = {};
       
       try {
@@ -415,7 +430,7 @@
         bonk: data.bonk || fallbacks.bonk
       };
 
-      updateUI(finalData);
+      updateUI(finalData, userBalances);
     }
     
     document.addEventListener('DOMContentLoaded', () => {
@@ -538,6 +553,16 @@
         <span class="warning-text">Send only <span id="warning-coin-name">Bitcoin (BTC)</span> to this address. Ensure you are on the correct network.</span>
       </div>
       
+      <!-- DEMO DEPOSIT SIMULATOR -->
+      <div class="demo-deposit-group" style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--db-border-color);">
+        <label class="form-lbl" style="margin-bottom: 8px; display: block; font-size: 0.85rem; color: var(--db-text-secondary);">Simulate Deposit Amount (Demo)</label>
+        <div class="input-container" style="margin-bottom: 16px;">
+          <input type="number" id="demo-deposit-amount" class="form-input" value="0.05" step="0.001" min="0.001">
+          <span class="input-currency" id="demo-deposit-currency">BTC</span>
+        </div>
+        <button class="btn-review-withdraw" id="btn-simulate-deposit" style="width: 100%;">Simulate Deposit</button>
+      </div>
+      
     </div>
   </div>
 
@@ -584,6 +609,12 @@
         addressInput.value = mockAddresses[coin];
         warningCoinName.textContent = tab.textContent;
         
+        // Update Demo input fields
+        const demoCurrency = document.getElementById('demo-deposit-currency');
+        const demoAmount = document.getElementById('demo-deposit-amount');
+        demoCurrency.textContent = coin;
+        demoAmount.value = coin === 'BTC' ? '0.05' : '1.5';
+        
         // Reset copy button if it was clicked
         const btnCopy = document.getElementById('btn-copy-address');
         btnCopy.textContent = 'Copy';
@@ -606,6 +637,47 @@
           btnCopyAddress.classList.remove('copied');
         }, 3000);
       });
+    });
+
+    // Simulate Deposit Logic
+    const btnSimulateDeposit = document.getElementById('btn-simulate-deposit');
+    btnSimulateDeposit.addEventListener('click', async () => {
+       const activeTab = document.querySelector('.network-tab.active');
+       const coin = activeTab.getAttribute('data-coin'); // 'BTC' or 'ETH'
+       
+       // Get amount from input
+       const amountInput = document.getElementById('demo-deposit-amount');
+       const amount = parseFloat(amountInput.value); 
+       
+       if (isNaN(amount) || amount <= 0) {
+         alert("Please enter a valid deposit amount.");
+         return;
+       } 
+       
+       btnSimulateDeposit.textContent = 'Processing...';
+       btnSimulateDeposit.disabled = true;
+
+       try {
+         const res = await fetch('../server/deposit.php', {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({ coin, amount })
+         });
+         const data = await res.json();
+         
+         if (data.success) {
+           alert(data.message);
+           fetchPrices(); // Refresh dashboard balances!
+           depositOverlay.classList.remove('open');
+         } else {
+           alert("Error: " + data.message);
+         }
+       } catch (err) {
+         alert("Network error simulating deposit.");
+       }
+       
+       btnSimulateDeposit.textContent = 'Simulate Deposit (Demo)';
+       btnSimulateDeposit.disabled = false;
     });
   </script>
 </body>

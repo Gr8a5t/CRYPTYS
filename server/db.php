@@ -46,6 +46,9 @@ try {
         full_name VARCHAR(100) NOT NULL,
         email VARCHAR(150) NOT NULL UNIQUE,
         password_hash VARCHAR(255) NOT NULL,
+        balance_usd DECIMAL(18,2) DEFAULT 0.00,
+        balance_btc DECIMAL(18,8) DEFAULT 0.00000000,
+        balance_eth DECIMAL(18,8) DEFAULT 0.00000000,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )";
     

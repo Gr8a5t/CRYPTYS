@@ -1305,11 +1305,13 @@ input:checked + .slider:before {
   backdrop-filter: blur(8px);
   z-index: 1000;
   display: flex;
-  align-items: center;
+  align-items: flex-start; /* Prevent top cut-off */
   justify-content: center;
   opacity: 0;
   visibility: hidden;
   transition: var(--db-transition);
+  overflow-y: auto; /* Make overlay scrollable */
+  padding: 40px 20px; /* Padding for small screens */
 }
 
 .deposit-overlay.open {
@@ -1323,6 +1325,7 @@ input:checked + .slider:before {
   border-radius: var(--db-radius-lg);
   width: 100%;
   max-width: 480px;
+  margin: auto; /* Vertically center if smaller than viewport */
   padding: 32px;
   display: flex;
   flex-direction: column;
