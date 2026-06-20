@@ -12,9 +12,16 @@ $dbUrl = getenv('DATABASE_URL');
 if ($dbUrl) {
     // PRODUCTION DEPLOYMENT (Render + PostgreSQL)
     $parsedUrl = parse_url($dbUrl);
-    $dsn = "pgsql:host=" . $parsedUrl['host'] . ";port=" . $parsedUrl['port'] . ";dbname=" . ltrim($parsedUrl['path'], '/');
-    $username = $parsedUrl['user'];
-    $password = $parsedUrl['pass'];
+    if (!$parsedUrl) {
+        die(json_encode(["success" => false, "message" => "Invalid DATABASE_URL"]));
+    }
+    $host = isset($parsedUrl['host']) ? $parsedUrl['host'] : 'localhost';
+    $port = isset($parsedUrl['port']) ? $parsedUrl['port'] : 5432;
+    $dbname = isset($parsedUrl['path']) ? ltrim($parsedUrl['path'], '/') : '';
+    $username = isset($parsedUrl['user']) ? $parsedUrl['user'] : null;
+    $password = isset($parsedUrl['pass']) ? $parsedUrl['pass'] : null;
+    
+    $dsn = "pgsql:host={$host};port={$port};dbname={$dbname}";
     $isPostgres = true;
 } else {
     // LOCAL DEVELOPMENT (SQLite)
