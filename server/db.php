@@ -56,7 +56,7 @@ try {
         balance_usd DECIMAL(18,2) DEFAULT 0.00,
         balance_btc DECIMAL(18,8) DEFAULT 0.00000000,
         balance_eth DECIMAL(18,8) DEFAULT 0.00000000,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )";
     $pdo->exec($query);
 
@@ -69,7 +69,7 @@ try {
         amount_usd DECIMAL(18,2) NOT NULL,
         daily_roi DECIMAL(5,2) NOT NULL,
         status VARCHAR(20) DEFAULT 'active',
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )";
     $pdo->exec($query2);
 
@@ -82,7 +82,7 @@ try {
         amount DECIMAL(18,6) NOT NULL,
         address VARCHAR(100) NOT NULL,
         status VARCHAR(20) DEFAULT 'pending',
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )";
     $pdo->exec($query3);
 
@@ -94,7 +94,7 @@ try {
         coin VARCHAR(10) NOT NULL,
         amount DECIMAL(18,6) NOT NULL,
         status VARCHAR(20) DEFAULT 'completed',
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )";
     $pdo->exec($query4);
 
