@@ -5,25 +5,25 @@
 // DATABASE CONFIGURATION
 // ---------------------------------------------------------
 
-// LOCAL DEVELOPMENT (SQLite)
-// This will automatically create a 'database.sqlite' file in this folder
-$dbFile = __DIR__ . '/database.sqlite';
-$dsn = "sqlite:$dbFile";
-$username = null;
-$password = null;
+// DYNAMIC DATABASE CONFIGURATION
+// If deploying to Render, set the DATABASE_URL environment variable.
+$dbUrl = getenv('DATABASE_URL');
 
-// =========================================================
-// PRODUCTION DEPLOYMENT (Render + PostgreSQL)
-// When you host on Render, COMMENT OUT the SQLite section above,
-// and UNCOMMENT the lines below, pasting your Render Database URL.
-// =========================================================
-/*
-// Example Render URL: postgres://user:pass@host:5432/dbname
-$dbUrl = parse_url("postgres://your_render_db_url_here");
-$dsn = "pgsql:host=" . $dbUrl['host'] . ";port=" . $dbUrl['port'] . ";dbname=" . ltrim($dbUrl['path'], '/');
-$username = $dbUrl['user'];
-$password = $dbUrl['pass'];
-*/
+if ($dbUrl) {
+    // PRODUCTION DEPLOYMENT (Render + PostgreSQL)
+    $parsedUrl = parse_url($dbUrl);
+    $dsn = "pgsql:host=" . $parsedUrl['host'] . ";port=" . $parsedUrl['port'] . ";dbname=" . ltrim($parsedUrl['path'], '/');
+    $username = $parsedUrl['user'];
+    $password = $parsedUrl['pass'];
+    $isPostgres = true;
+} else {
+    // LOCAL DEVELOPMENT (SQLite)
+    $dbFile = __DIR__ . '/database.sqlite';
+    $dsn = "sqlite:$dbFile";
+    $username = null;
+    $password = null;
+    $isPostgres = false;
+}
 
 try {
     // Create the PDO connection
@@ -35,14 +35,14 @@ try {
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
     // ---------------------------------------------------------
-    // AUTO-MIGRATION: Create Users Table if it doesn't exist
+    // AUTO-MIGRATION
     // ---------------------------------------------------------
-    // NOTE: PostgreSQL uses 'SERIAL' instead of 'INTEGER PRIMARY KEY AUTOINCREMENT'. 
-    // When you switch to Postgres, change the first line to: id SERIAL PRIMARY KEY,
-    
+    $primaryKeySyntax = $isPostgres ? "SERIAL PRIMARY KEY" : "INTEGER PRIMARY KEY AUTOINCREMENT";
+
+    // 1. Create Users Table
     $query = "
     CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT, 
+        id {$primaryKeySyntax}, 
         full_name VARCHAR(100) NOT NULL,
         email VARCHAR(150) NOT NULL UNIQUE,
         password_hash VARCHAR(255) NOT NULL,
@@ -51,15 +51,12 @@ try {
         balance_eth DECIMAL(18,8) DEFAULT 0.00000000,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )";
-    
     $pdo->exec($query);
 
-    // ---------------------------------------------------------
-    // AUTO-MIGRATION: Create Investments Table
-    // ---------------------------------------------------------
+    // 2. Create Investments Table
     $query2 = "
     CREATE TABLE IF NOT EXISTS investments (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id {$primaryKeySyntax},
         user_id INTEGER NOT NULL,
         plan_name VARCHAR(50) NOT NULL,
         amount_usd DECIMAL(18,2) NOT NULL,
@@ -69,12 +66,10 @@ try {
     )";
     $pdo->exec($query2);
 
-    // ---------------------------------------------------------
-    // AUTO-MIGRATION: Create Withdrawals Table
-    // ---------------------------------------------------------
+    // 3. Create Withdrawals Table
     $query3 = "
     CREATE TABLE IF NOT EXISTS withdrawals (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id {$primaryKeySyntax},
         user_id INTEGER NOT NULL,
         coin VARCHAR(10) NOT NULL,
         amount DECIMAL(18,6) NOT NULL,
@@ -84,12 +79,10 @@ try {
     )";
     $pdo->exec($query3);
 
-    // ---------------------------------------------------------
-    // AUTO-MIGRATION: Create Deposits Table
-    // ---------------------------------------------------------
+    // 4. Create Deposits Table
     $query4 = "
     CREATE TABLE IF NOT EXISTS deposits (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id {$primaryKeySyntax},
         user_id INTEGER NOT NULL,
         coin VARCHAR(10) NOT NULL,
         amount DECIMAL(18,6) NOT NULL,

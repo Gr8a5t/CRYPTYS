@@ -1,0 +1,16 @@
+# Git
+.git
+.gitignore
+
+# Database files
+server/database.sqlite
+server/database.sqlite-shm
+server/database.sqlite-wal
+
+# Editor folders
+.vscode
+.idea
+
+# Temporary files
+*.log
+.DS_Store
