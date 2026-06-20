@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRYPTYS | Create Account</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background-color: var(--clr-bg-dark);
+      background-image: 
+        radial-gradient(circle at 15% 50%, rgba(255, 122, 0, 0.08), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(255, 122, 0, 0.08), transparent 25%);
+    }
+    .auth-container {
+      width: 100%;
+      max-width: 440px;
+      padding: 40px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 24px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    .auth-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .auth-logo {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--clr-white);
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 16px;
+    }
+    .auth-logo span { color: var(--clr-accent-orange); }
+    .auth-title {
+      font-size: 28px;
+      margin-bottom: 8px;
+      color: var(--clr-text-primary);
+    }
+    .auth-subtitle {
+      color: var(--clr-text-secondary);
+      font-size: 15px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--clr-text-secondary);
+    }
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      color: var(--clr-white);
+      font-family: inherit;
+      font-size: 15px;
+      transition: border-color 0.3s, background 0.3s;
+      box-sizing: border-box;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: var(--clr-accent-orange);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 16px;
+      background: var(--clr-accent-orange);
+      color: var(--clr-white);
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.3s;
+    }
+    .btn-submit:hover {
+      background: #e66000;
+    }
+    .btn-submit:disabled {
+      background: #555;
+      cursor: not-allowed;
+    }
+    .auth-footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 14px;
+      color: var(--clr-text-secondary);
+    }
+    .auth-footer a {
+      color: var(--clr-accent-orange);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .auth-footer a:hover { text-decoration: underline; }
+    
+    #error-msg {
+      display: none;
+      background: rgba(239, 68, 68, 0.1);
+      color: #f87171;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      font-size: 14px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="auth-container">
+    <div class="auth-header">
+      <a href="index.html" class="auth-logo">CRYPTYS<span>.</span></a>
+      <h1 class="auth-title">Create Account</h1>
+      <p class="auth-subtitle">Start your crypto journey today.</p>
+    </div>
+
+    <div id="error-msg"></div>
+
+    <form id="register-form">
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input type="text" id="fullName" class="form-input" placeholder="e.g. Satoshi Nakamoto" required>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" id="email" class="form-input" placeholder="you@example.com" required>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+      </div>
+      
+      <button type="submit" class="btn-submit" id="btn-submit">Sign Up</button>
+    </form>
+
+    <div class="auth-footer">
+      Already have an account? <a href="login.html">Log In</a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const fullName = document.getElementById('fullName').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const btn = document.getElementById('btn-submit');
+      const errorBox = document.getElementById('error-msg');
+      
+      btn.disabled = true;
+      btn.textContent = 'Creating account...';
+      errorBox.style.display = 'none';
+
+      try {
+        const response = await fetch('../server/auth.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'register',
+            full_name: fullName,
+            email: email,
+            password: password
+          })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          // Redirect to dashboard on successful registration
+          window.location.href = 'dashboard.html';
+        } else {
+          errorBox.textContent = data.message;
+          errorBox.style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = 'Sign Up';
+        }
+      } catch (err) {
+        errorBox.textContent = 'Network error. Could not connect to server.';
+        errorBox.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Sign Up';
+      }
+    });
+  </script>
+</body>
+</html>

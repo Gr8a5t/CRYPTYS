@@ -31,7 +31,7 @@
         <!-- Overview Group -->
         <div class="menu-category">
           <div class="menu-cat-title">Overview</div>
-          <a href="dashboard.html" class="menu-item active" id="menu-overview">
+          <a href="dashboard.html" class="menu-item" id="menu-overview">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="3" width="7" height="9"/>
               <rect x="14" y="3" width="7" height="5"/>
@@ -45,7 +45,7 @@
         <!-- Trade Group -->
         <div class="menu-category">
           <div class="menu-cat-title">Trade</div>
-          <a href="invest.html" class="menu-item" id="menu-invest">
+          <a href="invest.html" class="menu-item active" id="menu-invest">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
             </svg>
@@ -140,204 +140,97 @@
         </div>
       </header>
       
-      <!-- Current Balance Widget -->
-      <section class="balance-card" id="widget-balance">
-        <div class="balance-header">
-          <span class="balance-title">Current Balance</span>
-          <div class="balance-amount-group">
-            <h2 class="balance-amount">$5,723.18</h2>
-            <span class="balance-trend">+2.4%</span>
-          </div>
-        </div>
-        
-        <!-- balance sparkline -->
-        <div class="balance-chart-container">
-          <svg viewBox="0 0 500 120" preserveAspectRatio="none" style="width: 100%; height: 100%; display: block;">
-            <defs>
-              <linearGradient id="balance-chart-grad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#6366f1" stop-opacity="0.25"/>
-                <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
-              </linearGradient>
-            </defs>
-            <!-- Area under path -->
-            <path d="M 0 110 C 50 80, 80 105, 120 75 C 160 45, 200 85, 250 55 C 300 25, 340 95, 390 45 C 440 15, 470 35, 500 20 L 500 120 L 0 120 Z" fill="url(#balance-chart-grad)" />
-            <!-- Line path -->
-            <path d="M 0 110 C 50 80, 80 105, 120 75 C 160 45, 200 85, 250 55 C 300 25, 340 95, 390 45 C 440 15, 470 35, 500 20" stroke="#6366f1" stroke-width="3" fill="none" stroke-linecap="round" />
-          </svg>
-        </div>
-      </section>
+      <!-- View: Overview -->
+      <div id="view-overview" class="view-section active">
       
-      <!-- Investment Portfolios Section -->
-      <section class="portfolios-section" id="widget-portfolios">
-        <div class="section-header">
-          <h3 class="section-title">Investment Portfolios</h3>
-          <div class="slider-controls">
-            <button class="slider-arrow" id="btn-slide-left" aria-label="Previous">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="15 18 9 12 15 6"/>
-              </svg>
-            </button>
-            <button class="slider-arrow" id="btn-slide-right" aria-label="Next">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="9 18 15 12 9 6"/>
-              </svg>
-            </button>
-          </div>
+        <div id="view-invest" class="view-section active">
+        <div class="plans-header">
+          <h2 class="plans-title">Investment Plans</h2>
+          <p class="plans-subtitle">Select a fixed-yield ROI package to accelerate your portfolio.</p>
         </div>
         
-        <div class="portfolio-cards-container">
-          <!-- BTC Card -->
-          <div class="portfolio-card" id="card-btc">
-            <div class="port-card-top">
-              <div class="coin-info">
-                <div class="coin-logo-bg btc">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Z" fill="#F7931A"/>
-                    <path d="M10.2 6.5V17.5M13.8 6.5V17.5M8 8.5H13.2C14.8 8.5 15.8 9.3 15.8 10.5C15.8 11.5 15 12.2 13.8 12.5C15.2 12.8 16.2 13.6 16.2 15C16.2 16.3 15 17.5 13.2 17.5H8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </div>
-                <div class="coin-name-code">
-                  <span class="coin-name">Bitcoin</span>
-                  <span class="coin-code">BTC</span>
-                </div>
+        <div class="plans-grid">
+          
+          <!-- Starter Plan -->
+          <div class="plan-card">
+            <div class="plan-content">
+              <h3 class="plan-name">Starter Plan</h3>
+              <div class="plan-roi-box">
+                <span class="plan-roi-val">1.5%</span>
+                <span class="plan-roi-lbl">Daily ROI</span>
               </div>
-              
-              <!-- Mini Sparkline -->
-              <svg class="port-sparkline" viewBox="0 0 80 30">
-                <path d="M 0 25 C 10 5, 20 18, 30 12 C 40 8, 50 25, 60 8 C 70 2, 75 12, 80 5" stroke="#10b981" stroke-width="2" fill="none" stroke-linecap="round" />
-              </svg>
-            </div>
-            
-            <div class="port-card-mid">
-              <span class="port-value">$28,150.40</span>
-              <span class="port-change-tag positive">+1.1%</span>
-            </div>
-            
-            <div class="port-card-bottom">
-              <div class="port-stat-group">
-                <span class="port-stat-lbl">Balance</span>
-                <span class="port-stat-val">0.124 BTC</span>
-              </div>
-              <div class="port-stat-group">
-                <span class="port-stat-lbl">Value</span>
-                <span class="port-stat-val">$3,490.65</span>
-              </div>
+              <ul class="plan-details-list">
+                <li class="plan-detail-item">
+                  <svg class="plan-detail-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  Duration: <span>7 Days</span>
+                </li>
+                <li class="plan-detail-item">
+                  <svg class="plan-detail-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  Min Deposit: <span>$50</span>
+                </li>
+                <li class="plan-detail-item">
+                  <svg class="plan-detail-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  Max Deposit: <span>$499</span>
+                </li>
+              </ul>
+              <button class="btn-invest" onclick="alert('Insufficient Balance. Please deposit funds first.')">Invest Now</button>
             </div>
           </div>
           
-          <!-- ETH Card -->
-          <div class="portfolio-card" id="card-eth">
-            <div class="port-card-top">
-              <div class="coin-info">
-                <div class="coin-logo-bg eth">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2L4 11.5L12 16L20 11.5L12 2Z" fill="#8C8CFF"/>
-                    <path d="M12 16L4 11.5L12 22L20 11.5L12 16Z" fill="#3B3BFF"/>
-                  </svg>
-                </div>
-                <div class="coin-name-code">
-                  <span class="coin-name">Ethereum</span>
-                  <span class="coin-code">ETH</span>
-                </div>
+          <!-- Growth Plan -->
+          <div class="plan-card featured">
+            <div class="plan-content">
+              <h3 class="plan-name">Growth Plan</h3>
+              <div class="plan-roi-box">
+                <span class="plan-roi-val">2.5%</span>
+                <span class="plan-roi-lbl">Daily ROI</span>
               </div>
-              
-              <!-- Mini Sparkline -->
-              <svg class="port-sparkline" viewBox="0 0 80 30">
-                <path d="M 0 10 C 15 28, 30 12, 45 28 C 60 10, 70 24, 80 20" stroke="#ef4444" stroke-width="2" fill="none" stroke-linecap="round" />
-              </svg>
-            </div>
-            
-            <div class="port-card-mid">
-              <span class="port-value">$1,845.20</span>
-              <span class="port-change-tag negative">-0.5%</span>
-            </div>
-            
-            <div class="port-card-bottom">
-              <div class="port-stat-group">
-                <span class="port-stat-lbl">Balance</span>
-                <span class="port-stat-val">1.21 ETH</span>
-              </div>
-              <div class="port-stat-group">
-                <span class="port-stat-lbl">Value</span>
-                <span class="port-stat-val">$2,232.53</span>
-              </div>
+              <ul class="plan-details-list">
+                <li class="plan-detail-item">
+                  <svg class="plan-detail-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  Duration: <span>14 Days</span>
+                </li>
+                <li class="plan-detail-item">
+                  <svg class="plan-detail-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  Min Deposit: <span>$500</span>
+                </li>
+                <li class="plan-detail-item">
+                  <svg class="plan-detail-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  Max Deposit: <span>$1,999</span>
+                </li>
+              </ul>
+              <button class="btn-invest" onclick="alert('Insufficient Balance. Please deposit funds first.')">Invest Now</button>
             </div>
           </div>
+          
+          <!-- Premium Plan -->
+          <div class="plan-card">
+            <div class="plan-content">
+              <h3 class="plan-name">Premium Plan</h3>
+              <div class="plan-roi-box">
+                <span class="plan-roi-val">4.0%</span>
+                <span class="plan-roi-lbl">Daily ROI</span>
+              </div>
+              <ul class="plan-details-list">
+                <li class="plan-detail-item">
+                  <svg class="plan-detail-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  Duration: <span>30 Days</span>
+                </li>
+                <li class="plan-detail-item">
+                  <svg class="plan-detail-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  Min Deposit: <span>$2,000</span>
+                </li>
+                <li class="plan-detail-item">
+                  <svg class="plan-detail-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  Max Deposit: <span>$10,000</span>
+                </li>
+              </ul>
+              <button class="btn-invest" onclick="alert('Insufficient Balance. Please deposit funds first.')">Invest Now</button>
+            </div>
+          </div>
+          
         </div>
-      </section>
-      
-      <!-- Recent Transactions Section -->
-      <section class="transactions-section" id="widget-transactions">
-        <div class="tx-header-row">
-          <h3 class="tx-title">Recent Transactions</h3>
-          <a href="#" class="tx-see-all">See All</a>
-        </div>
-        
-        <table class="tx-table">
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Date</th>
-              <th>Amount</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Row 1 -->
-            <tr>
-              <td>
-                <div class="tx-type-group">
-                  <div class="tx-icon-bg receive">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                      <line x1="12" y1="5" x2="12" y2="19"/>
-                      <polyline points="19 12 12 19 5 12"/>
-                    </svg>
-                  </div>
-                  <span class="tx-type-name">Receive BTC</span>
-                </div>
-              </td>
-              <td><span class="tx-date">Oct 26, 14:32</span></td>
-              <td><span class="tx-amount positive">+0.012 BTC</span></td>
-              <td><span class="tx-status-pill completed">Completed</span></td>
-            </tr>
-            
-            <!-- Row 2 -->
-            <tr>
-              <td>
-                <div class="tx-type-group">
-                  <div class="tx-icon-bg buy">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                    </svg>
-                  </div>
-                  <span class="tx-type-name">Buy ETH</span>
-                </div>
-              </td>
-              <td><span class="tx-date">Oct 26, 14:32</span></td>
-              <td><span class="tx-amount positive">+1.0 ETH</span></td>
-              <td><span class="tx-status-pill completed">Completed</span></td>
-            </tr>
-            
-            <!-- Row 3 -->
-            <tr>
-              <td>
-                <div class="tx-type-group">
-                  <div class="tx-icon-bg send">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                      <line x1="12" y1="19" x2="12" y2="5"/>
-                      <polyline points="5 12 12 5 19 12"/>
-                    </svg>
-                  </div>
-                  <span class="tx-type-name">Send USDT</span>
-                </div>
-              </td>
-              <td><span class="tx-date">Oct 26, 14:32</span></td>
-              <td><span class="tx-amount">-500.00 USDT</span></td>
-              <td><span class="tx-status-pill completed">Completed</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
+      </div>
       
 
     </main>
@@ -804,6 +697,31 @@
           btnCopyAddress.classList.remove('copied');
         }, 3000);
       });
+    });
+    // View Switcher Logic
+    const menuOverview = document.getElementById('menu-overview');
+    const menuInvest = document.getElementById('menu-invest');
+    const viewOverview = document.getElementById('view-overview');
+    const viewInvest = document.getElementById('view-invest');
+
+    function switchView(activeMenu, activeView) {
+      // Reset menus
+      document.querySelectorAll('.sidebar-menu .menu-item').forEach(el => el.classList.remove('active'));
+      activeMenu.classList.add('active');
+      
+      // Reset views
+      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+      activeView.classList.add('active');
+    }
+
+    menuOverview.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchView(menuOverview, viewOverview);
+    });
+
+    menuInvest.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchView(menuInvest, viewInvest);
     });
   </script>
 </body>
