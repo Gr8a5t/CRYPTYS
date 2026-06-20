@@ -548,22 +548,65 @@
         }
       }
 
+      const data = {};
+      
       try {
-        const res = await fetch('https://api.coingecko.org/api/v3/simple/price?ids=bitcoin,ethereum,pepe,floki,bonk&vs_currencies=usd&include_24hr_change=true');
-        if (!res.ok) throw new Error('Network response not ok: ' + res.status);
-        const data = await res.json();
-        updateUI(data);
-      } catch (err) {
-        console.warn('Using offline fallback mock prices due to error:', err.message);
-        const fallbackData = {
-          bitcoin: { usd: 67345.0, usd_24h_change: 1.25 },
-          ethereum: { usd: 3540.2, usd_24h_change: -0.54 },
-          pepe: { usd: 0.00001234, usd_24h_change: 5.67 },
-          floki: { usd: 0.0002345, usd_24h_change: -2.12 },
-          bonk: { usd: 0.00002134, usd_24h_change: -4.56 }
-        };
-        updateUI(fallbackData);
+        // "Backend PHP Proxy": Fetch prices through our local PHP server to bypass browser Adblockers/Firewalls!
+        const res = await fetch('../server/proxy.php');
+        
+        if (res.ok) {
+          const json = await res.json();
+          
+          // Check if our PHP script threw an internal error
+          if (json.proxy_error) {
+             throw new Error("PHP cURL Error: " + json.message);
+          }
+          
+          if (typeof json !== 'object' || json === null) {
+             throw new Error("Data from PHP is not a valid JSON object.");
+          }
+
+          // CoinGecko perfectly matches our coin IDs
+          Object.keys(json).forEach(key => {
+            if (json[key] && json[key].usd !== undefined) {
+              data[key] = {
+                usd: parseFloat(json[key].usd),
+                usd_24h_change: parseFloat(json[key].usd_24h_change || 0)
+              };
+            }
+          });
+          
+          // Clear the debug banner if it succeeds!
+          const banner = document.getElementById('debug-banner');
+          if(banner) banner.remove();
+          
+        } else {
+          console.warn('Local Proxy returned status:', res.status);
+          throw new Error(`Local Server Status ${res.status}`);
+        }
+      } catch (e) {
+        console.warn('Failed to fetch from PHP Proxy:', e.message);
       }
+      
+      // Fallbacks in case any specific coin fails to fetch
+      const fallbacks = {
+        bitcoin: { usd: 67345.0, usd_24h_change: 1.25 },
+        ethereum: { usd: 3540.2, usd_24h_change: -0.54 },
+        pepe: { usd: 0.00001234, usd_24h_change: 5.67 },
+        floki: { usd: 0.0002345, usd_24h_change: -2.12 },
+        bonk: { usd: 0.00002134, usd_24h_change: -4.56 }
+      };
+
+      // Merge the successfully fetched live data with the fallbacks
+      const finalData = {
+        bitcoin: data.bitcoin || fallbacks.bitcoin,
+        ethereum: data.ethereum || fallbacks.ethereum,
+        pepe: data.pepe || fallbacks.pepe,
+        floki: data.floki || fallbacks.floki,
+        bonk: data.bonk || fallbacks.bonk
+      };
+
+      updateUI(finalData);
     }
     
     document.addEventListener('DOMContentLoaded', () => {
