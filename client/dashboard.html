@@ -110,6 +110,13 @@
       <!-- Top Header Bar -->
       <header class="main-header" id="dashboard-header">
         <div class="breadcrumbs">
+          <button class="mobile-menu-btn" id="btn-mobile-menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
           Trade <span class="crumb-separator">/</span> <span class="current">Withdraw</span>
         </div>
         
@@ -730,6 +737,26 @@
         
         btnRight.addEventListener('click', () => {
           portfolioContainer.scrollBy({ left: 300, behavior: 'smooth' });
+        });
+      }
+      
+      // Mobile Menu Toggle
+      const mobileBtn = document.getElementById('btn-mobile-menu');
+      const sidebar = document.querySelector('.sidebar');
+      if (mobileBtn && sidebar) {
+        mobileBtn.addEventListener('click', () => {
+          sidebar.classList.toggle('mobile-open');
+        });
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+          if (window.innerWidth <= 768 && 
+              sidebar.classList.contains('mobile-open') && 
+              !sidebar.contains(e.target) && 
+              e.target !== mobileBtn && 
+              !mobileBtn.contains(e.target)) {
+            sidebar.classList.remove('mobile-open');
+          }
         });
       }
     });

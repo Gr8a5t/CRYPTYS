@@ -964,7 +964,31 @@ button, input, select {
     grid-template-columns: 1fr;
   }
   .sidebar {
-    display: none; /* In a real product we would toggle this with a burger menu */
+    position: fixed;
+    top: 0;
+    left: -260px; /* Hide off screen by default */
+    height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
+  }
+  .sidebar.mobile-open {
+    left: 0; /* Slide in */
+  }
+  .mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--db-text-primary);
+    cursor: pointer;
+    margin-right: 12px;
+    padding: 4px;
+    border-radius: var(--db-radius-md);
+  }
+  .mobile-menu-btn:hover {
+    background-color: var(--db-bg-hover);
   }
   .main-content {
     padding: 24px 16px;
@@ -973,6 +997,13 @@ button, input, select {
     grid-column: span 1;
     flex-direction: column;
     padding: 24px 16px;
+  }
+}
+
+/* Hide mobile menu button on desktop */
+@media (min-width: 769px) {
+  .mobile-menu-btn {
+    display: none;
   }
 }
 

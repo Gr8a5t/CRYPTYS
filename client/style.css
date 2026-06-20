@@ -1395,3 +1395,99 @@ body {
     text-align: center;
   }
 }
+
+/* ==========================================================================
+   Mobile Navigation Overlay
+   ========================================================================== */
+
+.landing-mobile-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--clr-text-primary);
+  cursor: pointer;
+  padding: 8px;
+  margin-left: 12px;
+}
+
+@media (max-width: 768px) {
+  .landing-mobile-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  #header-cta-btn .btn-explore {
+    display: none; /* Hide explore button on mobile header to save space */
+  }
+}
+
+.mobile-nav-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition-smooth);
+}
+
+.mobile-nav-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-nav-content {
+  position: absolute;
+  top: 0;
+  right: -100%;
+  width: 280px;
+  height: 100%;
+  background: var(--clr-bg-dark);
+  border-left: 1px solid var(--clr-border);
+  padding: 80px 24px 40px;
+  display: flex;
+  flex-direction: column;
+  transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-nav-overlay.active .mobile-nav-content {
+  right: 0;
+}
+
+.mobile-nav-close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: transparent;
+  border: none;
+  color: var(--clr-text-muted);
+  cursor: pointer;
+  padding: 8px;
+}
+
+.mobile-nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.mobile-nav-item {
+  color: var(--clr-text-primary);
+  text-decoration: none;
+  font-size: 1.2rem;
+  font-weight: 500;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mobile-nav-item.highlight {
+  color: var(--clr-accent-orange);
+  border-bottom: none;
+  margin-top: 16px;
+  font-weight: 700;
+}
