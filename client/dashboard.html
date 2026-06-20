@@ -263,6 +263,46 @@
               </div>
             </div>
           </div>
+
+          <!-- USDT Card -->
+          <div class="portfolio-card" id="card-usdt">
+            <div class="port-card-top">
+              <div class="coin-info">
+                <div class="coin-logo-bg swap">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="2" x2="12" y2="22"/>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                  </svg>
+                </div>
+                <div class="coin-name-code">
+                  <span class="coin-name">Tether</span>
+                  <span class="coin-code">USDT</span>
+                </div>
+              </div>
+              
+              <!-- Mini Sparkline (Flat for Stablecoin) -->
+              <svg class="port-sparkline" viewBox="0 0 80 30">
+                <path d="M 0 15 L 80 15" stroke="#22c55e" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="4 4" />
+              </svg>
+            </div>
+            
+            <div class="port-card-mid">
+              <span class="port-value">$1.00</span>
+              <span class="port-change-tag positive">0.0%</span>
+            </div>
+            
+            <div class="port-card-bottom">
+              <div class="port-stat-group">
+                <span class="port-stat-lbl">Balance</span>
+                <span class="port-stat-val">0.00 USDT</span>
+              </div>
+              <div class="port-stat-group">
+                <span class="port-stat-lbl">Value</span>
+                <span class="port-stat-val">$0.00</span>
+              </div>
+            </div>
+          </div>
+          
         </div>
       </section>
       
@@ -436,19 +476,23 @@
           // Holdings from Database
           const btcQty = balances.btc;
           const ethQty = balances.eth;
+          const usdtQty = balances.usd;
           
           const btcPrice = data.bitcoin.usd;
           const ethPrice = data.ethereum.usd;
+          const usdtPrice = 1.00; // Tether is stable 1:1
           
           const btcValue = btcQty * btcPrice;
           const ethValue = ethQty * ethPrice;
+          const usdtValue = usdtQty * usdtPrice;
           
-          const totalBalance = btcValue + ethValue;
+          const totalBalance = btcValue + ethValue + usdtValue;
           
-          // Calculate weighted portfolio change
+          // Calculate weighted portfolio change (USDT has 0 change)
           const btcChange = data.bitcoin.usd_24h_change || 0;
           const ethChange = data.ethereum.usd_24h_change || 0;
-          const totalWeight = btcValue + ethValue;
+          const usdtChange = 0;
+          const totalWeight = totalBalance;
           const weightedChange = totalWeight > 0 ? (((btcValue * btcChange) + (ethValue * ethChange)) / totalWeight) : 0;
           
           // Update UI - Current Balance
@@ -467,6 +511,7 @@
           // Update UI - BTC Card
           document.querySelector('#card-btc .port-value').textContent = '$' + btcPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
           document.querySelector('#card-btc .port-stat-val').textContent = '$' + btcValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          document.querySelector('#card-btc .port-stat-group:first-child .port-stat-val').textContent = btcQty.toLocaleString(undefined, { maximumFractionDigits: 6 }) + ' BTC';
           
           const btcChangeTag = document.querySelector('#card-btc .port-change-tag');
           btcChangeTag.textContent = (btcChange >= 0 ? '+' : '') + btcChange.toFixed(2) + '%';
@@ -475,9 +520,17 @@
           // Update UI - ETH Card
           document.querySelector('#card-eth .port-value').textContent = '$' + ethPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
           document.querySelector('#card-eth .port-stat-val').textContent = '$' + ethValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          document.querySelector('#card-eth .port-stat-group:first-child .port-stat-val').textContent = ethQty.toLocaleString(undefined, { maximumFractionDigits: 6 }) + ' ETH';
           
           const ethChangeTag = document.querySelector('#card-eth .port-change-tag');
           ethChangeTag.textContent = (ethChange >= 0 ? '+' : '') + ethChange.toFixed(2) + '%';
+          ethChangeTag.className = 'port-change-tag ' + (ethChange >= 0 ? 'positive' : 'negative');
+          
+          // Update UI - USDT Card
+          if (document.querySelector('#card-usdt')) {
+            document.querySelector('#card-usdt .port-stat-val').textContent = '$' + usdtValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.querySelector('#card-usdt .port-stat-group:first-child .port-stat-val').textContent = usdtQty.toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' USDT';
+          }
           ethChangeTag.className = 'port-change-tag ' + (ethChange >= 0 ? 'positive' : 'negative');
           
           // Update UI - Trending PEPE
@@ -658,6 +711,21 @@
     
     document.addEventListener('DOMContentLoaded', () => {
       fetchPrices();
+      
+      // Portfolio Carousel Slider Controls
+      const portfolioContainer = document.querySelector('.portfolio-cards-container');
+      const btnLeft = document.getElementById('btn-slide-left');
+      const btnRight = document.getElementById('btn-slide-right');
+      
+      if (btnLeft && btnRight && portfolioContainer) {
+        btnLeft.addEventListener('click', () => {
+          portfolioContainer.scrollBy({ left: -300, behavior: 'smooth' });
+        });
+        
+        btnRight.addEventListener('click', () => {
+          portfolioContainer.scrollBy({ left: 300, behavior: 'smooth' });
+        });
+      }
     });
   </script>
   <!-- Settings Offcanvas Modal -->

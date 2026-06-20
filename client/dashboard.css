@@ -419,12 +419,22 @@ button, input, select {
 }
 
 .portfolio-cards-container {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
   gap: 20px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+}
+
+.portfolio-cards-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
 }
 
 .portfolio-card {
+  flex: 0 0 auto;
+  min-width: 280px;
+  width: calc(50% - 10px); /* Display 2 on desktop naturally */
   background-color: var(--db-bg-panel);
   border: 1px solid var(--db-border-color);
   border-radius: var(--db-radius-lg);
@@ -939,8 +949,13 @@ button, input, select {
 }
 
 @media (max-width: 992px) {
-  .portfolio-cards-container {
+  .dashboard-main-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .portfolio-card {
+    min-width: 280px;
+    width: 280px; /* Force consistent width on mobile carousel */
   }
 }
 
