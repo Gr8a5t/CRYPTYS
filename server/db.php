@@ -54,6 +54,50 @@ try {
     
     $pdo->exec($query);
 
+    // ---------------------------------------------------------
+    // AUTO-MIGRATION: Create Investments Table
+    // ---------------------------------------------------------
+    $query2 = "
+    CREATE TABLE IF NOT EXISTS investments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        plan_name VARCHAR(50) NOT NULL,
+        amount_usd DECIMAL(18,2) NOT NULL,
+        daily_roi DECIMAL(5,2) NOT NULL,
+        status VARCHAR(20) DEFAULT 'active',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )";
+    $pdo->exec($query2);
+
+    // ---------------------------------------------------------
+    // AUTO-MIGRATION: Create Withdrawals Table
+    // ---------------------------------------------------------
+    $query3 = "
+    CREATE TABLE IF NOT EXISTS withdrawals (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        coin VARCHAR(10) NOT NULL,
+        amount DECIMAL(18,6) NOT NULL,
+        address VARCHAR(100) NOT NULL,
+        status VARCHAR(20) DEFAULT 'pending',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )";
+    $pdo->exec($query3);
+
+    // ---------------------------------------------------------
+    // AUTO-MIGRATION: Create Deposits Table
+    // ---------------------------------------------------------
+    $query4 = "
+    CREATE TABLE IF NOT EXISTS deposits (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        coin VARCHAR(10) NOT NULL,
+        amount DECIMAL(18,6) NOT NULL,
+        status VARCHAR(20) DEFAULT 'completed',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )";
+    $pdo->exec($query4);
+
 } catch (PDOException $e) {
     // If the database fails to connect, output a JSON error and exit
     header('Content-Type: application/json');

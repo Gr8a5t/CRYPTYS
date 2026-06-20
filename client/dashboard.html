@@ -282,58 +282,12 @@
               <th>Status</th>
             </tr>
           </thead>
-          <tbody>
-            <!-- Row 1 -->
+          <tbody id="tx-table-body">
+            <!-- Dynamic rows will be injected here -->
             <tr>
-              <td>
-                <div class="tx-type-group">
-                  <div class="tx-icon-bg receive">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                      <line x1="12" y1="5" x2="12" y2="19"/>
-                      <polyline points="19 12 12 19 5 12"/>
-                    </svg>
-                  </div>
-                  <span class="tx-type-name">Receive BTC</span>
-                </div>
+              <td colspan="4" style="text-align: center; padding: 24px; color: var(--db-text-secondary);">
+                Loading transactions...
               </td>
-              <td><span class="tx-date">Oct 26, 14:32</span></td>
-              <td><span class="tx-amount positive">+0.012 BTC</span></td>
-              <td><span class="tx-status-pill completed">Completed</span></td>
-            </tr>
-            
-            <!-- Row 2 -->
-            <tr>
-              <td>
-                <div class="tx-type-group">
-                  <div class="tx-icon-bg buy">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                    </svg>
-                  </div>
-                  <span class="tx-type-name">Buy ETH</span>
-                </div>
-              </td>
-              <td><span class="tx-date">Oct 26, 14:32</span></td>
-              <td><span class="tx-amount positive">+1.0 ETH</span></td>
-              <td><span class="tx-status-pill completed">Completed</span></td>
-            </tr>
-            
-            <!-- Row 3 -->
-            <tr>
-              <td>
-                <div class="tx-type-group">
-                  <div class="tx-icon-bg send">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                      <line x1="12" y1="19" x2="12" y2="5"/>
-                      <polyline points="5 12 12 5 19 12"/>
-                    </svg>
-                  </div>
-                  <span class="tx-type-name">Send USDT</span>
-                </div>
-              </td>
-              <td><span class="tx-date">Oct 26, 14:32</span></td>
-              <td><span class="tx-amount">-500.00 USDT</span></td>
-              <td><span class="tx-status-pill completed">Completed</span></td>
             </tr>
           </tbody>
         </table>
@@ -351,11 +305,11 @@
       <section class="withdraw-card" id="widget-withdraw-form">
         <h3 class="withdraw-title">Withdraw Funds</h3>
         
-        <form class="withdraw-form" onsubmit="event.preventDefault(); alert('Withdrawal request submitted.');">
+        <form class="withdraw-form" id="form-quick-withdraw">
           <div class="form-group">
             <label class="form-lbl">Amount</label>
             <div class="input-container">
-              <input type="text" value="40.42" class="form-input">
+              <input type="number" id="quick-withdraw-amount" value="500" class="form-input" step="1" min="1">
               <span class="input-currency">USD</span>
             </div>
           </div>
@@ -367,10 +321,10 @@
                 <rect x="3" y="10" width="18" height="11" rx="2" ry="2"/>
                 <path d="M7 10V7a5 5 0 0 1 10 0v4"/>
               </svg>
-              <select class="dropdown-select">
-                <option value="chase">Chase Bank - **4512</option>
-                <option value="boa">Bank of America - **7890</option>
-                <option value="wells">Wells Fargo - **1234</option>
+              <select id="quick-withdraw-bank" class="dropdown-select">
+                <option value="Chase Bank - **4512">Chase Bank - **4512</option>
+                <option value="Bank of America - **7890">Bank of America - **7890</option>
+                <option value="Wells Fargo - **1234">Wells Fargo - **1234</option>
               </select>
               <svg class="dropdown-arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="6 9 12 15 18 9"/>
@@ -378,7 +332,7 @@
             </div>
           </div>
           
-          <button type="submit" class="btn-review-withdraw">Review Withdrawal</button>
+          <button type="submit" id="btn-submit-quick-withdraw" class="btn-review-withdraw">Quick Bank Withdrawal</button>
         </form>
       </section>
       
@@ -550,8 +504,84 @@
           bonkPct.textContent = (bonkChange >= 0 ? '+' : '') + bonkChange.toFixed(2) + '%';
           bonkPct.className = 'trend-pct ' + (bonkChange >= 0 ? 'positive' : 'negative');
           
+          // Fetch transactions after updating prices
+          fetchTransactions();
+
         } catch (uiErr) {
           console.error('Error updating UI with price data:', uiErr);
+        }
+      }
+
+      async function fetchTransactions() {
+        const txBody = document.getElementById('tx-table-body');
+        if (!txBody) return;
+
+        try {
+          const res = await fetch('../server/transactions.php');
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success && data.data) {
+              if (data.data.length === 0) {
+                txBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 24px; color: var(--db-text-secondary);">No transactions found.</td></tr>`;
+                return;
+              }
+
+              let rowsHTML = '';
+              data.data.forEach(tx => {
+                // Formatting Date
+                const d = new Date(tx.created_at);
+                const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ', ' + 
+                              d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                
+                // Set styling based on type
+                let iconClass = 'swap';
+                let iconSVG = '';
+                let amountClass = 'neutral';
+                let amountPrefix = '';
+                let typeName = tx.type + ' ' + tx.coin;
+                
+                if (tx.type === 'Deposit') {
+                  iconClass = 'receive';
+                  amountClass = 'positive';
+                  amountPrefix = '+';
+                  iconSVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`;
+                } else if (tx.type === 'Withdrawal') {
+                  iconClass = 'send';
+                  amountClass = 'negative';
+                  amountPrefix = '-';
+                  iconSVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`;
+                } else if (tx.type === 'Investment') {
+                  iconClass = 'swap';
+                  amountClass = 'negative';
+                  amountPrefix = '-';
+                  iconSVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>`;
+                }
+
+                // Status formatting
+                const statusCap = tx.status.charAt(0).toUpperCase() + tx.status.slice(1);
+                let statusClass = 'pending';
+                if (tx.status === 'completed') statusClass = 'completed';
+
+                rowsHTML += `
+                  <tr>
+                    <td>
+                      <div class="tx-type-group">
+                        <div class="tx-icon-bg ${iconClass}">${iconSVG}</div>
+                        <span class="tx-type-name">${typeName}</span>
+                      </div>
+                    </td>
+                    <td><span class="tx-date">${dateStr}</span></td>
+                    <td><span class="tx-amount ${amountClass}">${amountPrefix}${tx.amount.toLocaleString(undefined, { maximumFractionDigits: 6 })} ${tx.coin}</span></td>
+                    <td><span class="tx-status-pill ${statusClass}">${statusCap}</span></td>
+                  </tr>
+                `;
+              });
+              
+              txBody.innerHTML = rowsHTML;
+            }
+          }
+        } catch (e) {
+          console.error("Failed to load transactions", e);
         }
       }
 
@@ -722,6 +752,7 @@
         <div class="network-tabs">
           <div class="network-tab active" data-coin="BTC">Bitcoin (BTC)</div>
           <div class="network-tab" data-coin="ETH">Ethereum (ETH)</div>
+          <div class="network-tab" data-coin="USDT">Tether (USDT)</div>
         </div>
       </div>
       
@@ -792,7 +823,8 @@
     
     const mockAddresses = {
       'BTC': '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa',
-      'ETH': '0x71C7656EC7ab88b098defB751B7401B5f6d8976F'
+      'ETH': '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+      'USDT': 'T9yD14Nj9j7xAB4dbGeiX9h8unkKZ3Ts8m'
     };
 
     networkTabs.forEach(tab => {
@@ -811,7 +843,9 @@
         const demoCurrency = document.getElementById('demo-deposit-currency');
         const demoAmount = document.getElementById('demo-deposit-amount');
         demoCurrency.textContent = coin;
-        demoAmount.value = coin === 'BTC' ? '0.05' : '1.5';
+        if (coin === 'BTC') demoAmount.value = '0.05';
+        else if (coin === 'ETH') demoAmount.value = '1.5';
+        else if (coin === 'USDT') demoAmount.value = '5000';
         
         // Reset copy button if it was clicked
         const btnCopy = document.getElementById('btn-copy-address');
@@ -877,6 +911,228 @@
        btnSimulateDeposit.textContent = 'Simulate Deposit (Demo)';
        btnSimulateDeposit.disabled = false;
     });
+
+    // Quick Bank Withdrawal Logic (Right Panel)
+    const formQuickWithdraw = document.getElementById('form-quick-withdraw');
+    const btnSubmitQuickWithdraw = document.getElementById('btn-submit-quick-withdraw');
+    
+    if (formQuickWithdraw) {
+      formQuickWithdraw.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const coin = 'USDT';
+        const address = document.getElementById('quick-withdraw-bank').value;
+        const amount = parseFloat(document.getElementById('quick-withdraw-amount').value);
+        
+        if (isNaN(amount) || amount <= 0) {
+          alert("Please enter a valid amount.");
+          return;
+        }
+        
+        btnSubmitQuickWithdraw.textContent = 'Processing...';
+        btnSubmitQuickWithdraw.disabled = true;
+
+        try {
+          const res = await fetch('../server/withdraw.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ coin, amount, address })
+          });
+          const data = await res.json();
+          
+          if (data.success) {
+            alert(data.message);
+            formQuickWithdraw.reset();
+            fetchPrices(); // Refresh dashboard balances!
+          } else {
+            alert("Withdrawal failed: " + data.message);
+          }
+        } catch (err) {
+          alert("Network error processing withdrawal.");
+        }
+        
+        btnSubmitQuickWithdraw.textContent = 'Quick Bank Withdrawal';
+        btnSubmitQuickWithdraw.disabled = false;
+      });
+    }
+
+    // ==========================================
+    // Full Withdrawal Modal Logic (Sidebar CTA)
+    // ==========================================
+    
+    // Inject the withdraw modal DOM into the body
+    const withdrawModalHTML = `
+      <div class="deposit-overlay" id="withdraw-overlay">
+        <div class="deposit-modal" id="withdraw-modal">
+          <div class="modal-header">
+            <h4 class="modal-title">Withdraw</h4>
+            <button class="btn-close-modal" id="btn-close-withdraw">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="deposit-network-select" style="margin-bottom: 24px;">
+            <span class="address-label">Withdraw Method</span>
+            <div class="network-tabs" id="withdraw-method-tabs">
+              <div class="network-tab active" data-method="crypto">Crypto Wallet</div>
+              <div class="network-tab" data-method="bank">Bank Transfer</div>
+            </div>
+          </div>
+
+          <!-- Crypto Form -->
+          <form class="withdraw-form" id="form-full-withdraw-crypto">
+            <div class="form-group" style="margin-bottom: 14px;">
+              <label class="form-lbl">Asset</label>
+              <div class="dropdown-container">
+                <select id="full-withdraw-coin" class="dropdown-select" style="padding-left: 12px;">
+                  <option value="BTC">Bitcoin (BTC)</option>
+                  <option value="ETH">Ethereum (ETH)</option>
+                  <option value="USDT">Tether (USDT)</option>
+                </select>
+                <svg class="dropdown-arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 14px;">
+              <label class="form-lbl">Destination Address</label>
+              <input type="text" id="full-withdraw-address" class="form-input" placeholder="e.g. 1A1zP1e..." style="padding-left: 12px;">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 20px;">
+              <label class="form-lbl">Amount</label>
+              <div class="input-container">
+                <input type="number" id="full-withdraw-amount" placeholder="0.00" class="form-input" step="0.000001" min="0.000001">
+              </div>
+            </div>
+            
+            <button type="submit" id="btn-submit-full-crypto" class="btn-review-withdraw" style="width: 100%;">Review Crypto Withdrawal</button>
+          </form>
+
+          <!-- Bank Form -->
+          <form class="withdraw-form" id="form-full-withdraw-bank" style="display: none;">
+            <div class="form-group" style="margin-bottom: 14px;">
+              <label class="form-lbl">Select Bank</label>
+              <div class="dropdown-container">
+                <select id="full-withdraw-bank-account" class="dropdown-select" style="padding-left: 12px;">
+                  <option value="Chase Bank - **4512">Chase Bank - **4512</option>
+                  <option value="Bank of America - **7890">Bank of America - **7890</option>
+                  <option value="Wells Fargo - **1234">Wells Fargo - **1234</option>
+                </select>
+                <svg class="dropdown-arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </div>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 20px;">
+              <label class="form-lbl">Amount (USD)</label>
+              <div class="input-container">
+                <input type="number" id="full-withdraw-bank-amount" placeholder="0.00" class="form-input" step="1" min="1">
+              </div>
+            </div>
+            
+            <button type="submit" id="btn-submit-full-bank" class="btn-review-withdraw" style="width: 100%;">Review Bank Withdrawal</button>
+          </form>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', withdrawModalHTML);
+
+    const menuWithdraw = document.getElementById('menu-withdraw');
+    const withdrawOverlay = document.getElementById('withdraw-overlay');
+    const btnCloseWithdraw = document.getElementById('btn-close-withdraw');
+    const withdrawMethodTabs = document.querySelectorAll('#withdraw-method-tabs .network-tab');
+    const formFullCrypto = document.getElementById('form-full-withdraw-crypto');
+    const formFullBank = document.getElementById('form-full-withdraw-bank');
+
+    menuWithdraw.addEventListener('click', (e) => {
+      e.preventDefault();
+      withdrawOverlay.classList.add('open');
+    });
+
+    btnCloseWithdraw.addEventListener('click', () => {
+      withdrawOverlay.classList.remove('open');
+    });
+
+    withdrawOverlay.addEventListener('click', (e) => {
+      if (e.target === withdrawOverlay) {
+        withdrawOverlay.classList.remove('open');
+      }
+    });
+
+    withdrawMethodTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        withdrawMethodTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        if (tab.dataset.method === 'crypto') {
+          formFullCrypto.style.display = 'block';
+          formFullBank.style.display = 'none';
+        } else {
+          formFullCrypto.style.display = 'none';
+          formFullBank.style.display = 'block';
+        }
+      });
+    });
+
+    async function processFullWithdrawal(coin, address, amount, btnElement, formElement, btnText) {
+      if (!address || address.length < 10) {
+        alert("Please select a valid destination or bank.");
+        return;
+      }
+      if (isNaN(amount) || amount <= 0) {
+        alert("Please enter a valid amount.");
+        return;
+      }
+      
+      btnElement.textContent = 'Processing...';
+      btnElement.disabled = true;
+
+      try {
+        const res = await fetch('../server/withdraw.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ coin, amount, address })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          alert(data.message);
+          formElement.reset();
+          withdrawOverlay.classList.remove('open');
+          fetchPrices(); // Refresh dashboard balances!
+        } else {
+          alert("Withdrawal failed: " + data.message);
+        }
+      } catch (err) {
+        alert("Network error processing withdrawal.");
+      }
+      
+      btnElement.textContent = btnText;
+      btnElement.disabled = false;
+    }
+
+    formFullCrypto.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const coin = document.getElementById('full-withdraw-coin').value;
+      const address = document.getElementById('full-withdraw-address').value;
+      const amount = parseFloat(document.getElementById('full-withdraw-amount').value);
+      processFullWithdrawal(coin, address, amount, document.getElementById('btn-submit-full-crypto'), formFullCrypto, 'Review Crypto Withdrawal');
+    });
+
+    formFullBank.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const coin = 'USDT';
+      const address = document.getElementById('full-withdraw-bank-account').value;
+      const amount = parseFloat(document.getElementById('full-withdraw-bank-amount').value);
+      processFullWithdrawal(coin, address, amount, document.getElementById('btn-submit-full-bank'), formFullBank, 'Review Bank Withdrawal');
+    });
+
   </script>
 </body>
 </html>

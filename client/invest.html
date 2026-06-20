@@ -211,7 +211,7 @@
                   Max Deposit: <span>$499</span>
                 </li>
               </ul>
-              <button class="btn-invest" onclick="alert('Insufficient Balance. Please deposit funds first.')">Invest Now</button>
+              <button class="btn-invest" onclick="openInvestModal('Starter Plan', 50, 499)">Invest Now</button>
             </div>
           </div>
           
@@ -237,7 +237,7 @@
                   Max Deposit: <span>$1,999</span>
                 </li>
               </ul>
-              <button class="btn-invest" onclick="alert('Insufficient Balance. Please deposit funds first.')">Invest Now</button>
+              <button class="btn-invest" onclick="openInvestModal('Growth Plan', 500, 1999)">Invest Now</button>
             </div>
           </div>
           
@@ -263,7 +263,7 @@
                   Max Deposit: <span>$10,000</span>
                 </li>
               </ul>
-              <button class="btn-invest" onclick="alert('Insufficient Balance. Please deposit funds first.')">Invest Now</button>
+              <button class="btn-invest" onclick="openInvestModal('Premium Plan', 2000, 100000)">Invest Now</button>
             </div>
           </div>
           
@@ -352,12 +352,19 @@
           bonkPct.textContent = (bonkChange >= 0 ? '+' : '') + bonkChange.toFixed(2) + '%';
           bonkPct.className = 'trend-pct ' + (bonkChange >= 0 ? 'positive' : 'negative');
           
+          // Update Yield Hero
+          const yieldHeroEl = document.querySelector('.yield-hero-amount');
+          if (yieldHeroEl) {
+            yieldHeroEl.textContent = '$' + (balances.total_invested || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.querySelector('.yh-stat-val:last-child').textContent = balances.active_plans || 0;
+          }
+
         } catch (uiErr) {
           console.error('Error updating UI with price data:', uiErr);
         }
       }
 
-      let userBalances = { btc: 0, eth: 0, usd: 0 };
+      let userBalances = { btc: 0, eth: 0, usd: 0, total_invested: 0, active_plans: 0 };
       try {
         const userRes = await fetch('../server/api.php');
         if (userRes.ok) {
@@ -366,6 +373,8 @@
             userBalances.btc = userData.data.balance_btc || 0;
             userBalances.eth = userData.data.balance_eth || 0;
             userBalances.usd = userData.data.balance_usd || 0;
+            userBalances.total_invested = userData.data.total_invested || 0;
+            userBalances.active_plans = userData.data.active_plans || 0;
           }
         }
       } catch (e) {
@@ -524,6 +533,7 @@
         <div class="network-tabs">
           <div class="network-tab active" data-coin="BTC">Bitcoin (BTC)</div>
           <div class="network-tab" data-coin="ETH">Ethereum (ETH)</div>
+          <div class="network-tab" data-coin="USDT">Tether (USDT)</div>
         </div>
       </div>
       
@@ -594,7 +604,8 @@
     
     const mockAddresses = {
       'BTC': '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa',
-      'ETH': '0x71C7656EC7ab88b098defB751B7401B5f6d8976F'
+      'ETH': '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+      'USDT': 'T9yD14Nj9j7xAB4dbGeiX9h8unkKZ3Ts8m'
     };
 
     networkTabs.forEach(tab => {
@@ -613,7 +624,9 @@
         const demoCurrency = document.getElementById('demo-deposit-currency');
         const demoAmount = document.getElementById('demo-deposit-amount');
         demoCurrency.textContent = coin;
-        demoAmount.value = coin === 'BTC' ? '0.05' : '1.5';
+        if (coin === 'BTC') demoAmount.value = '0.05';
+        else if (coin === 'ETH') demoAmount.value = '1.5';
+        else if (coin === 'USDT') demoAmount.value = '5000';
         
         // Reset copy button if it was clicked
         const btnCopy = document.getElementById('btn-copy-address');
@@ -679,6 +692,118 @@
        btnSimulateDeposit.textContent = 'Simulate Deposit (Demo)';
        btnSimulateDeposit.disabled = false;
     });
+
+    // ==========================================
+    // Investment Modal Logic
+    // ==========================================
+    
+    // Inject the investment modal DOM into the body
+    const investModalHTML = `
+      <div class="deposit-overlay" id="invest-overlay">
+        <div class="deposit-modal" id="invest-modal">
+          <div class="modal-header">
+            <h4 class="modal-title" id="invest-modal-title">Invest</h4>
+            <button class="btn-close-modal" id="btn-close-invest">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="demo-deposit-group">
+            <label class="form-lbl" style="margin-bottom: 8px; display: block; font-size: 0.85rem; color: var(--db-text-secondary);">Payment Method</label>
+            <select id="invest-payment-method" class="form-input" style="margin-bottom: 16px;">
+              <option value="USDT">USDT Balance</option>
+              <option value="BTC">Bitcoin Balance</option>
+              <option value="ETH">Ethereum Balance</option>
+            </select>
+            
+            <label class="form-lbl" style="margin-bottom: 8px; display: block; font-size: 0.85rem; color: var(--db-text-secondary);">Amount to Invest (USD)</label>
+            <div class="input-container" style="margin-bottom: 8px;">
+              <input type="number" id="invest-amount-input" class="form-input" placeholder="e.g. 500" step="1" min="1">
+              <span class="input-currency">USD</span>
+            </div>
+            <p id="invest-limits" style="font-size: 0.8rem; color: var(--db-text-secondary); margin-bottom: 24px;">Min: $50 | Max: $499</p>
+            
+            <button class="btn-review-withdraw" id="btn-confirm-invest" style="width: 100%;">Confirm Investment</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', investModalHTML);
+
+    const investOverlay = document.getElementById('invest-overlay');
+    const btnCloseInvest = document.getElementById('btn-close-invest');
+    const investModalTitle = document.getElementById('invest-modal-title');
+    const investLimits = document.getElementById('invest-limits');
+    const investAmountInput = document.getElementById('invest-amount-input');
+    const investPaymentMethod = document.getElementById('invest-payment-method');
+    const btnConfirmInvest = document.getElementById('btn-confirm-invest');
+
+    let currentPlanName = "";
+
+    window.openInvestModal = function(planName, min, max) {
+      currentPlanName = planName;
+      investModalTitle.textContent = `Invest in ${planName}`;
+      investLimits.textContent = `Min: $${min.toLocaleString()} | Max: $${max.toLocaleString()}`;
+      investAmountInput.value = min;
+      investOverlay.classList.add('open');
+    };
+
+    btnCloseInvest.addEventListener('click', () => {
+      investOverlay.classList.remove('open');
+    });
+
+    investOverlay.addEventListener('click', (e) => {
+      if (e.target === investOverlay) {
+        investOverlay.classList.remove('open');
+      }
+    });
+
+    btnConfirmInvest.addEventListener('click', async () => {
+      const amount = parseFloat(investAmountInput.value);
+      const paymentMethod = investPaymentMethod.value;
+      
+      btnConfirmInvest.textContent = 'Processing...';
+      btnConfirmInvest.disabled = true;
+
+      // Extract current rates from the DOM cards
+      let btcPrice = 67000;
+      let ethPrice = 3500;
+      const btcCard = document.querySelector('#card-btc .port-value');
+      const ethCard = document.querySelector('#card-eth .port-value');
+      if (btcCard) btcPrice = parseFloat(btcCard.textContent.replace(/[^0-9.-]+/g,""));
+      if (ethCard) ethPrice = parseFloat(ethCard.textContent.replace(/[^0-9.-]+/g,""));
+
+      try {
+        const res = await fetch('../server/invest.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            plan_name: currentPlanName, 
+            amount: amount,
+            payment_method: paymentMethod,
+            rates: { BTC: btcPrice, ETH: ethPrice }
+          })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          alert(data.message);
+          fetchPrices(); // Refresh active yield!
+          investOverlay.classList.remove('open');
+        } else {
+          alert("Investment failed: " + data.message);
+        }
+      } catch (err) {
+        alert("Network error.");
+      }
+      
+      btnConfirmInvest.textContent = 'Confirm Investment';
+      btnConfirmInvest.disabled = false;
+    });
+
   </script>
 </body>
 </html>

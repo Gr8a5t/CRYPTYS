@@ -29,16 +29,28 @@ if ($amount <= 0) {
 }
 
 try {
+    $pdo->beginTransaction();
+    
     if ($coin === 'BTC') {
         $stmt = $pdo->prepare("UPDATE users SET balance_btc = balance_btc + ? WHERE id = ?");
         $stmt->execute([$amount, $userId]);
     } else if ($coin === 'ETH') {
         $stmt = $pdo->prepare("UPDATE users SET balance_eth = balance_eth + ? WHERE id = ?");
         $stmt->execute([$amount, $userId]);
+    } else if ($coin === 'USDT') {
+        $stmt = $pdo->prepare("UPDATE users SET balance_usd = balance_usd + ? WHERE id = ?");
+        $stmt->execute([$amount, $userId]);
     } else {
+        $pdo->rollBack();
         echo json_encode(["success" => false, "message" => "Unsupported coin."]);
         exit();
     }
+    
+    // Log the deposit
+    $logStmt = $pdo->prepare("INSERT INTO deposits (user_id, coin, amount, status) VALUES (?, ?, ?, 'completed')");
+    $logStmt->execute([$userId, $coin, $amount]);
+    
+    $pdo->commit();
 
     echo json_encode([
         "success" => true,
@@ -46,6 +58,9 @@ try {
     ]);
 
 } catch (Exception $e) {
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     echo json_encode(["success" => false, "message" => "Deposit failed: " . $e->getMessage()]);
 }
 ?>

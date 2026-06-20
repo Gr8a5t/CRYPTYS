@@ -26,13 +26,20 @@ $stmt = $pdo->prepare("SELECT balance_usd, balance_btc, balance_eth FROM users W
 $stmt->execute([$userId]);
 $user = $stmt->fetch();
 
+// Fetch active investments sum
+$invStmt = $pdo->prepare("SELECT SUM(amount_usd) as total_invested, COUNT(id) as active_plans FROM investments WHERE user_id = ? AND status = 'active'");
+$invStmt->execute([$userId]);
+$invData = $invStmt->fetch();
+
 if ($user) {
     echo json_encode([
         "success" => true,
         "data" => [
             "balance_usd" => (float)$user['balance_usd'],
             "balance_btc" => (float)$user['balance_btc'],
-            "balance_eth" => (float)$user['balance_eth']
+            "balance_eth" => (float)$user['balance_eth'],
+            "total_invested" => (float)($invData['total_invested'] ?? 0),
+            "active_plans" => (int)($invData['active_plans'] ?? 0)
         ]
     ]);
 } else {
