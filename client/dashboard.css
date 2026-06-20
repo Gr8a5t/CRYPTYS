@@ -1511,3 +1511,110 @@ input:checked + .slider:before {
   font-weight: 700;
   color: var(--db-text-primary);
 }
+
+/* ==========================================================================
+   Investment Page Specific Styles
+   ========================================================================== */
+
+.invest-layout {
+  grid-template-columns: 260px 1fr;
+}
+
+.yield-hero-card {
+  background: linear-gradient(145deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.02));
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: var(--db-radius-lg);
+  padding: 32px;
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.yield-hero-card::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, rgba(0,0,0,0) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.yield-hero-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+}
+
+.yield-hero-left {
+  flex: 1;
+}
+
+.yield-hero-label {
+  font-size: 0.95rem;
+  color: var(--db-text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.yield-hero-amount {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: var(--db-text-primary);
+  margin: 8px 0 24px;
+  letter-spacing: -1px;
+}
+
+.yield-hero-stats {
+  display: flex;
+  gap: 32px;
+}
+
+.yh-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.yh-stat-lbl {
+  font-size: 0.85rem;
+  color: var(--db-text-secondary);
+}
+
+.yh-stat-val {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--db-text-primary);
+}
+
+.yield-hero-right {
+  flex: 1;
+  max-width: 400px;
+  height: 120px;
+}
+
+.yield-hero-chart {
+  width: 100%;
+  height: 100%;
+}
+
+.invest-layout .plans-grid {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 32px;
+}
+
+.invest-layout .plan-card {
+  padding: 40px 32px;
+}
+
+.invest-layout .plan-name {
+  font-size: 1.5rem;
+}
+
+.invest-layout .plan-roi-val {
+  font-size: 3rem;
+}

@@ -19,7 +19,7 @@
     }
   </script>
 
-  <div class="dashboard-layout" id="dashboard-main-grid">
+  <div class="dashboard-layout invest-layout" id="dashboard-main-grid">
     
     <!-- ==========================================
          1. Left Sidebar
@@ -145,9 +145,47 @@
       
         <div id="view-invest" class="view-section active">
         <div class="plans-header">
-          <h2 class="plans-title">Investment Plans</h2>
-          <p class="plans-subtitle">Select a fixed-yield ROI package to accelerate your portfolio.</p>
+          <h2 class="plans-title">Quantum Yield Engine</h2>
+          <p class="plans-subtitle">Select a fixed-yield ROI package to accelerate your portfolio growth.</p>
         </div>
+        
+        <!-- YIELD HERO WIDGET -->
+        <section class="yield-hero-card">
+          <div class="yield-hero-content">
+            <div class="yield-hero-left">
+              <span class="yield-hero-label">Total Active Yield</span>
+              <h2 class="yield-hero-amount">$0.00</h2>
+              <div class="yield-hero-stats">
+                <div class="yh-stat">
+                  <span class="yh-stat-lbl">Lifetime Accrued</span>
+                  <span class="yh-stat-val">$0.00</span>
+                </div>
+                <div class="yh-stat">
+                  <span class="yh-stat-lbl">Active Plans</span>
+                  <span class="yh-stat-val">0</span>
+                </div>
+              </div>
+            </div>
+            <div class="yield-hero-right">
+              <svg class="yield-hero-chart" viewBox="0 0 300 100" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="yield-grad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#10b981" stop-opacity="0.4"/>
+                    <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M 0 90 Q 50 80 100 60 T 200 40 T 300 10 L 300 100 L 0 100 Z" fill="url(#yield-grad)"/>
+                <path d="M 0 90 Q 50 80 100 60 T 200 40 T 300 10" stroke="#10b981" stroke-width="3" fill="none" stroke-linecap="round"/>
+                
+                <!-- Glowing node at the end -->
+                <circle cx="300" cy="10" r="4" fill="#10b981">
+                  <animate attributeName="r" values="4;8;4" dur="2s" repeatCount="indefinite" />
+                  <animate attributeName="opacity" values="1;0.4;1" dur="2s" repeatCount="indefinite" />
+                </circle>
+              </svg>
+            </div>
+          </div>
+        </section>
         
         <div class="plans-grid">
           
@@ -235,136 +273,7 @@
 
     </main>
     
-    <!-- ==========================================
-         3. Right Side Panel
-         ========================================== -->
-    <aside class="right-panel" id="right-utility-panel">
-      
-      <!-- Withdraw Funds Card -->
-      <section class="withdraw-card" id="widget-withdraw-form">
-        <h3 class="withdraw-title">Withdraw Funds</h3>
-        
-        <form class="withdraw-form" onsubmit="event.preventDefault(); alert('Withdrawal request submitted.');">
-          <div class="form-group">
-            <label class="form-lbl">Amount</label>
-            <div class="input-container">
-              <input type="text" value="40.42" class="form-input">
-              <span class="input-currency">USD</span>
-            </div>
-          </div>
-          
-          <div class="form-group" style="margin-top: 14px; margin-bottom: 20px;">
-            <label class="form-lbl">Recipient</label>
-            <div class="dropdown-container">
-              <svg class="dropdown-bank-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="10" width="18" height="11" rx="2" ry="2"/>
-                <path d="M7 10V7a5 5 0 0 1 10 0v4"/>
-              </svg>
-              <select class="dropdown-select">
-                <option value="chase">Chase Bank - **4512</option>
-                <option value="boa">Bank of America - **7890</option>
-                <option value="wells">Wells Fargo - **1234</option>
-              </select>
-              <svg class="dropdown-arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="6 9 12 15 18 9"/>
-              </svg>
-            </div>
-          </div>
-          
-          <button type="submit" class="btn-review-withdraw">Review Withdrawal</button>
-        </form>
-      </section>
-      
-      <!-- Promo Banner Card -->
-      <section class="promo-card" id="widget-promo-banner">
-        <div class="promo-illustration-box">
-          <!-- Isometric terminal illustration -->
-          <svg width="100" height="100" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- Card terminal body -->
-            <path d="M25 45 L75 25 L95 65 L45 85 Z" fill="#4f46e5" stroke="#ffffff" stroke-width="2"/>
-            <path d="M25 45 L45 85 L45 95 L25 55 Z" fill="#3730a3" stroke="#ffffff" stroke-width="2"/>
-            <path d="M45 85 L95 65 L95 75 L45 95 Z" fill="#312e81" stroke="#ffffff" stroke-width="2"/>
-            
-            <!-- Terminal Screen -->
-            <path d="M40 43 L70 31 L80 51 L50 63 Z" fill="#1e1b4b"/>
-            <rect x="52" y="42" width="12" height="6" fill="#10b981" rx="1" transform="rotate(-18 52 42)"/>
-            
-            <!-- Floating credit card -->
-            <path d="M55 15 L95 5 L105 30 L65 40 Z" fill="#818cf8" stroke="#ffffff" stroke-width="1.5"/>
-            <!-- Chip on card -->
-            <rect x="68" y="18" width="6" height="6" fill="#fbbf24" rx="1" transform="rotate(-14 68 18)"/>
-          </svg>
-        </div>
-        
-        <div class="promo-content">
-          <h4 class="promo-title">Level Up Your Trading</h4>
-          <p class="promo-desc">Get premium investment features, detailed performance analytics, and automated multi-plan yield tracking.</p>
-        </div>
-      </section>
-      
-      <!-- Trending Coins Widget -->
-      <section class="trending-card" id="widget-trending-list">
-        <h3 class="trending-title">Trending Coins</h3>
-        
-        <div class="trending-list">
-          <!-- Row 1: PEPE -->
-          <div class="trending-row">
-            <div class="trend-coin-info">
-              <span class="trend-rank">1</span>
-              <div class="trend-logo-bg pepe">
-                <!-- PEPE frog silhouette or generic token coin -->
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
-              </div>
-              <span class="trend-coin-name">PEPE</span>
-            </div>
-            
-            <div class="trend-price-group">
-              <span class="trend-price">$20.50</span>
-              <span class="trend-pct positive">+1.1%</span>
-            </div>
-          </div>
-          
-          <!-- Row 2: FLOKI -->
-          <div class="trending-row">
-            <div class="trend-coin-info">
-              <span class="trend-rank">2</span>
-              <div class="trend-logo-bg floki">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
-              </div>
-              <span class="trend-coin-name">FLOKI</span>
-            </div>
-            
-            <div class="trend-price-group">
-              <span class="trend-price">$1.001</span>
-              <span class="trend-pct negative">-0.5%</span>
-            </div>
-          </div>
-          
-          <!-- Row 3: BONK -->
-          <div class="trending-row">
-            <div class="trend-coin-info">
-              <span class="trend-rank">3</span>
-              <div class="trend-logo-bg bonk">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
-              </div>
-              <span class="trend-coin-name">BONK</span>
-            </div>
-            
-            <div class="trend-price-group">
-              <span class="trend-price">$0.36</span>
-              <span class="trend-pct negative">-2.5%</span>
-            </div>
-          </div>
-        </div>
-      </section>
-      
-    </aside>
+
     
   </div>
 
@@ -697,31 +606,6 @@
           btnCopyAddress.classList.remove('copied');
         }, 3000);
       });
-    });
-    // View Switcher Logic
-    const menuOverview = document.getElementById('menu-overview');
-    const menuInvest = document.getElementById('menu-invest');
-    const viewOverview = document.getElementById('view-overview');
-    const viewInvest = document.getElementById('view-invest');
-
-    function switchView(activeMenu, activeView) {
-      // Reset menus
-      document.querySelectorAll('.sidebar-menu .menu-item').forEach(el => el.classList.remove('active'));
-      activeMenu.classList.add('active');
-      
-      // Reset views
-      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-      activeView.classList.add('active');
-    }
-
-    menuOverview.addEventListener('click', (e) => {
-      e.preventDefault();
-      switchView(menuOverview, viewOverview);
-    });
-
-    menuInvest.addEventListener('click', (e) => {
-      e.preventDefault();
-      switchView(menuInvest, viewInvest);
     });
   </script>
 </body>
