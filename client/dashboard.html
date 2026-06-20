@@ -603,19 +603,14 @@
       const data = {};
       
       try {
-        // "Backend PHP Proxy": Fetch prices through our local PHP server to bypass browser Adblockers/Firewalls!
-        const res = await fetch('../server/proxy.php');
+        // Fetch directly from CoinGecko so the browser IP is used instead of Render's AWS IP
+        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,pepe,floki,bonk&vs_currencies=usd&include_24hr_change=true');
         
         if (res.ok) {
           const json = await res.json();
           
-          // Check if our PHP script threw an internal error
-          if (json.proxy_error) {
-             throw new Error("PHP cURL Error: " + json.message);
-          }
-          
           if (typeof json !== 'object' || json === null) {
-             throw new Error("Data from PHP is not a valid JSON object.");
+             throw new Error("Data from CoinGecko is not a valid JSON object.");
           }
 
           // CoinGecko perfectly matches our coin IDs
@@ -633,11 +628,11 @@
           if(banner) banner.remove();
           
         } else {
-          console.warn('Local Proxy returned status:', res.status);
-          throw new Error(`Local Server Status ${res.status}`);
+          console.warn('CoinGecko returned status:', res.status);
+          throw new Error(`CoinGecko Status ${res.status}`);
         }
       } catch (e) {
-        console.warn('Failed to fetch from PHP Proxy:', e.message);
+        console.warn('Failed to fetch from CoinGecko:', e.message);
       }
       
       // Fallbacks in case any specific coin fails to fetch
@@ -663,8 +658,6 @@
     
     document.addEventListener('DOMContentLoaded', () => {
       fetchPrices();
-      // Auto-refresh every 30 seconds
-      setInterval(fetchPrices, 30000);
     });
   </script>
   <!-- Settings Offcanvas Modal -->
